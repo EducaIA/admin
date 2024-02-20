@@ -1,0 +1,43 @@
+name: Trigger auto deployment for admin
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ main ]
+    paths:
+    - '**'
+    - '.github/workflows/admin-AutoDeployTrigger-449f145b-985a-4c0b-a64c-2cc7deba60e0.yml'
+
+  # Allow manual trigger 
+  workflow_dispatch:
+      
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.ADMIN_AZURE_CREDENTIALS }}
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          appSourcePath: ${{ github.workspace }} 
+          registryUrl: caf2fad93036acr.azurecr.io
+          registryUsername: ${{ secrets.ADMIN_REGISTRY_USERNAME }}
+          registryPassword: ${{ secrets.ADMIN_REGISTRY_PASSWORD }}
+          containerAppName: admin
+          resourceGroup: Educaia
+          imageToBuild: caf2fad93036acr.azurecr.io/admin:${{ github.sha }}
+          
+            
+
+     
+
