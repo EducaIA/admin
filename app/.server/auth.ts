@@ -13,6 +13,7 @@ import { GoogleStrategy } from "remix-auth-google";
 const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, NODE_ENV } = process.env;
 
 if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
+  console.log(process.env);
   throw new Error("You must provide GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET");
 }
 

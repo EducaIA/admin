@@ -38,9 +38,9 @@ function App() {
 
 let AppExport = App;
 // This imports the dev tools only if you're in development
-if (process.env.NODE_ENV === "development") {
+if (import.meta.env.NODE_ENV === "development") {
   const { withDevTools } = await import("remix-development-tools");
   AppExport = withDevTools(AppExport);
 }
 
-export default AppExport;
+export default App;

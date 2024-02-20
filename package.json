@@ -4,9 +4,10 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "dev": "remix vite:dev",
     "build": "remix vite:build",
-    "start": "remix-serve ./build/server/index.js"
+    "dev": "node ./server.js",
+    "start": "cross-env NODE_ENV=production node ./server.js",
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.0.4",
@@ -19,6 +20,7 @@
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-tooltip": "^1.0.7",
     "@remix-run/css-bundle": "^2.6.0",
+    "@remix-run/express": "^2.6.0",
     "@remix-run/node": "^2.6.0",
     "@remix-run/react": "^2.6.0",
     "@remix-run/serve": "^2.6.0",
@@ -55,6 +57,7 @@
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.7.4",
     "autoprefixer": "^10.4.17",
+    "cross-env": "^7.0.3",
     "drizzle-kit": "^0.20.14",
     "eslint": "^8.38.0",
     "eslint-import-resolver-typescript": "^3.6.1",

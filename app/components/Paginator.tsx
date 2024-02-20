@@ -1,4 +1,3 @@
-"use client";
 
 import { useSearchParams } from "@remix-run/react";
 import { Button } from "./ui/button";

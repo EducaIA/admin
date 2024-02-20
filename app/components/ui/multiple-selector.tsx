@@ -1,4 +1,3 @@
-"use client";
 
 import { Command as CommandPrimitive } from "cmdk";
 import { X } from "lucide-react";

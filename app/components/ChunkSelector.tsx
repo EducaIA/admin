@@ -1,5 +1,3 @@
-"use client";
-
 import lodash from "lodash";
 import { useReducer } from "react";
 import { match } from "ts-pattern";
@@ -124,12 +122,12 @@ export default function ChunkSelector({
               <div>
                 <span className="text-sm">{createChunkId(chunk)}</span>
               </div>
-              <div></div>
+              <div />
             </div>
           ))}
         </div>
       ) : (
-        <div></div>
+        <div />
       )}
       <div className="grid grid-cols-1 gap-y-2">
         <div className="grid auto-cols-auto grid-flow-col gap-x-4">
