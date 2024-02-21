@@ -8,7 +8,7 @@ import { stringToJSONSchema } from "~/utils/utils";
 
 const createQuestionSchema = z.object({
   pregunta: z.string(),
-  chunks: stringToJSONSchema.pipe(z.record(z.array(z.string()))),
+  chunks: stringToJSONSchema.pipe(z.record(z.array(z.string())).optional()),
   oposicion: z.string().default("infantil"),
   topics: stringToJSONSchema.pipe(z.array(z.string())),
   answer: z.record(z.string()),
@@ -30,11 +30,15 @@ export const runCreateQuestionAction = async (formData: FormData) => {
 
     const data = createQuestionSchema.safeParse({
       ...fullBody,
+      chunks: fullBody.chunk ?? "{}",
       answer,
     });
 
     if (!data.success) {
-      return redirect("/");
+      const errors = data.error.errors.map((error) => error.message).join(", ");
+      return redirectWithError("/", {
+        message: `Error en el formulario: ${errors}`,
+      });
     }
 
     const {
@@ -73,17 +77,23 @@ export const runCreateQuestionAction = async (formData: FormData) => {
 
       const cacheGroupId = res[0].cacheGroupId;
 
-      for (const [region, chunks] of Object.entries(regionalChunks)) {
-        await trx
-          .insert(cacheGroupChunks)
-          .values(
-            chunks.map((chunk) => ({
-              group_id: cacheGroupId,
-              chunk_id: chunk,
-              region,
-            })),
-          )
-          .execute();
+      if (!cacheGroupId) {
+        throw new Error("No se ha podido crear el grupo de cache");
+      }
+
+      if (typeof regionalChunks !== "undefined") {
+        for (const [region, chunks] of Object.entries(regionalChunks)) {
+          await trx
+            .insert(cacheGroupChunks)
+            .values(
+              chunks.map((chunk) => ({
+                group_id: cacheGroupId,
+                chunk_id: chunk,
+                region,
+              })),
+            )
+            .execute();
+        }
       }
     });
 
