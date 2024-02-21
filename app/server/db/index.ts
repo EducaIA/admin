@@ -94,7 +94,7 @@ export const getUserQuestions = async (onlyLegislative: boolean, page = 0) => {
       updated_at: messageData.updated_at,
       type: sql`'question'`.as("type"),
       legislative:
-        sql`(${messageData.data}->>'classified_question') ilike '%N/A%'`.as(
+        sql`(${messageData.data}->>'classified_question') not ilike '%N/A%'`.as(
           "legislative"
         ),
     })

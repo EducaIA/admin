@@ -38,8 +38,10 @@ export const runEditQuestionAction = async (formData: FormData) => {
     });
 
     if (!data.success) {
-      console.log("data", data.error);
-      return redirect("/");
+      const errors = data.error.errors.map((error) => error.message).join(", ");
+      return redirectWithError("/", {
+        message: `Error en el formulario: ${errors}`,
+      });
     }
 
     const {
@@ -58,10 +60,6 @@ export const runEditQuestionAction = async (formData: FormData) => {
         .from(cacheGroup)
         .where(eq(cacheGroup.id, id))
         .execute();
-
-      if (!existingGroup || existingGroup.length === 0) {
-        throw new Error("Cache group not found");
-      }
 
       const existingAnswer = existingGroup?.[0]?.answer ?? {};
       const fullAnswer = {

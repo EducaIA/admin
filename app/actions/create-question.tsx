@@ -88,7 +88,7 @@ export const runCreateQuestionAction = async (formData: FormData) => {
     });
 
     return redirectWithSuccess("/", {
-      message: "Pregunta creada correctamente",
+      message: "Grupo de cache creado correctamente",
     });
   } catch (error) {
     return redirectWithError("/", {

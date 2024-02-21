@@ -147,20 +147,20 @@ export function QuestionCard({
     }
   }, [responseFetcher.data, generatedResponses]);
 
-  const legal =
-    (initialData?.type === "userQuestion" &&
-      (initialData as UserQuestion)?.legislative) ||
-    false;
+  const legal = (initialData as UserQuestion)?.legislative || false;
 
   return (
     <Card className="h-fit">
       <CardContent className="space-y-4 p-4 pt-2 relative">
         <Form
-          method="PUT"
+          method={initialData.type === "question" ? "POST" : "PUT"}
           id={`edit-card-${initialData.id}`}
           preventScrollReset={true}
         >
-          <input type="hidden" name="id" value={initialData?.id} />
+          {initialData.type !== "question" && (
+            <input type="hidden" name="id" value={initialData.id} />
+          )}
+
           <input type="hidden" name="type" value={initialData.type} />
 
           <div className="row-[auto_auto] mx-auto grid grid-cols-3 gap-x-2 gap-y-2 bg-[#fff] mb-2">
