@@ -21,7 +21,9 @@ import { QuestionCard } from "~/components/QuestionCard";
 import Paginator from "~/components/Paginator";
 import { runCreateQuestionAction } from "~/actions/create-question";
 import { runEditQuestionAction } from "~/actions/edit-question";
-import { Toaster } from "sonner";
+import { getToast } from "remix-toast";
+import { toast as notify } from "sonner";
+import { useEffect } from "react";
 
 export const meta: MetaFunction = () => {
   return [{ title: "Educaia - Admin" }];
@@ -48,6 +50,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
   const page = params.get("page") ?? "1";
 
+  const { toast, headers } = await getToast(request);
+  // Important to pass in the headers so the toast is cleared properly
+
   return json(
     await promiseHash({
       chunkData: getChunkData(),
@@ -58,12 +63,14 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       cacheGroups: getExistingCacheGroups({
         page: Number(page) - 1,
       }),
+      toast: Promise.resolve(toast),
     }),
+    { headers },
   );
 };
 
 export default function Index() {
-  const { chunkData, topics, messageTypes, questions, cacheGroups } =
+  const { chunkData, topics, messageTypes, questions, cacheGroups, toast } =
     useLoaderData<typeof loader>();
 
   const regions = Object.keys(chunkData);
@@ -91,6 +98,14 @@ export default function Index() {
   fullList.sort((a, b) => {
     return (b.created_at ?? "").localeCompare(a.created_at ?? "");
   });
+
+  useEffect(() => {
+    if (toast) {
+      notify[toast.type as "info" | "success" | "error" | "warning"](
+        toast.message,
+      );
+    }
+  }, [toast]);
 
   return (
     <div className="h-full">

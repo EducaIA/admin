@@ -10,17 +10,9 @@ import { Toaster } from "sonner";
 
 import "./tailwind.css";
 
-// export const links: LinksFunction = () => [
-//   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
-//   ...(process.env.NODE_ENV === "development"
-//     ? [{ rel: "stylesheet", href: rdtStylesheet }]
-//     : []),
-//   { rel: "stylesheet", href: stylesheet },
-// ];
-
-function App() {
+export default function App() {
   return (
-    <html lang="en">
+    <html lang="es">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -28,6 +20,7 @@ function App() {
         <Links />
       </head>
       <body>
+        <Toaster />
         <Outlet />
         <ScrollRestoration />
         <Scripts />
@@ -35,12 +28,3 @@ function App() {
     </html>
   );
 }
-
-let AppExport = App;
-// This imports the dev tools only if you're in development
-if (import.meta.env.NODE_ENV === "development") {
-  const { withDevTools } = await import("remix-development-tools");
-  AppExport = withDevTools(AppExport);
-}
-
-export default App;
