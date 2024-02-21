@@ -51,7 +51,18 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const page = params.get("page") ?? "1";
 
   const { toast, headers } = await getToast(request);
-  // Important to pass in the headers so the toast is cleared properly
+  const onlyLegislative = params.get("questionType") === "legislativas";
+
+  let questionsPromise = getUserQuestions(onlyLegislative, Number(page) - 1);
+  let cacheGroupsPromise = getExistingCacheGroups({
+    page: Number(page) - 1,
+  });
+
+  if (params.get("showing") === "cached") {
+    questionsPromise = Promise.resolve([]);
+  } else if (params.get("showing") === "non-cached") {
+    cacheGroupsPromise = Promise.resolve([]);
+  }
 
   return json(
     await promiseHash({
@@ -59,10 +70,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       topics: getTopics(),
       messageTypes: getMessageTypes(),
       oposiciones: getOposiciones(),
-      questions: getUserQuestions(false, Number(page) - 1),
-      cacheGroups: getExistingCacheGroups({
-        page: Number(page) - 1,
-      }),
+      questions: questionsPromise,
+      cacheGroups: cacheGroupsPromise,
       toast: Promise.resolve(toast),
     }),
     { headers },
@@ -83,17 +92,7 @@ export default function Index() {
     }))
     .sort((a, b) => a.id - b.id);
 
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  let fullList = [];
-
-  if (searchParams.get("showing") === "cached") {
-    fullList = cacheGroups;
-  } else if (searchParams.get("showing") === "non-cached") {
-    fullList = questions;
-  } else {
-    fullList = [...questions, ...cacheGroups];
-  }
+  const fullList = [...questions, ...cacheGroups];
 
   fullList.sort((a, b) => {
     return (b.created_at ?? "").localeCompare(a.created_at ?? "");

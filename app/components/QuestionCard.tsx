@@ -1,4 +1,3 @@
-
 import { Check, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -156,18 +155,6 @@ export function QuestionCard({
   return (
     <Card className="h-fit">
       <CardContent className="space-y-4 p-4 pt-2 relative">
-        <button
-          type="button"
-          className="absolute top-2 right-2"
-          onClick={() => {
-            toast.info(
-              "No se ha implementado la funcionalidad de eliminar preguntas",
-              { duration: 50000 },
-            );
-          }}
-        >
-          <X className="h-6 w-6" />
-        </button>
         <Form
           method="PUT"
           id={`edit-card-${initialData.id}`}

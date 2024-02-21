@@ -64,8 +64,8 @@ export const getExistingCacheGroups = async ({
     },
     where: and(search ? ilike(cacheGroup.question, `%${search}%`) : undefined),
     orderBy: desc(cacheGroup.id),
-    limit: 10,
-    offset: page * 10,
+    limit: 50,
+    offset: page * 50,
     extras: {
       type: sql`'cached'`.as("type"),
     },
@@ -110,13 +110,13 @@ export const getUserQuestions = async (onlyLegislative: boolean, page = 0) => {
         sql`${messageData.id} NOT IN (SELECT DISTINCT id FROM ${cacheGroup})`,
         or(isNotNull(questions.content), isNotNull(answers.content)),
         onlyLegislative
-          ? sql`(${messageData.data}->>'classified_question') ilike '%N/A%'`
+          ? sql`(${messageData.data}->>'classified_question') not ilike '%N/A%'`
           : undefined
       )
     )
     .orderBy(desc(messageData.id))
-    .limit(10)
-    .offset(page * 10);
+    .limit(50)
+    .offset(page * 50);
 };
 
 export type UserQuestion = Awaited<ReturnType<typeof getUserQuestions>>[number];
