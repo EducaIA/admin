@@ -1,19 +1,16 @@
 // app/services/auth.server.ts
 import { Authenticator } from "remix-auth";
-import { sessionStorage } from "./session.server";
+import { sessionStorage } from "./session";
 
-// Create an instance of the authenticator, pass a generic with what
-// strategies will return and will store in the session
 export const authenticator = new Authenticator<{
   email: string;
 }>(sessionStorage);
 
 import { GoogleStrategy } from "remix-auth-google";
 
-const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, NODE_ENV } = process.env;
+const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } = process.env;
 
 if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
-  console.log(process.env);
   throw new Error("You must provide GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET");
 }
 

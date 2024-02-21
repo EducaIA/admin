@@ -3,6 +3,8 @@ import { drizzle } from "drizzle-orm/node-postgres";
 
 import { getDBConnection } from "./conn";
 import { data_db_schema } from "./schema";
+import { cachified } from "~/.server/cache";
+import { FullChunkSelectorData } from "~/types";
 
 const conn = await getDBConnection({
   database: "data_dev",
@@ -31,7 +33,7 @@ export const getChunkData = async () => {
     END as nacional FROM region_data;`
   );
 
-  return rows.reduce((acc, row) => {
+  return rows.reduce<FullChunkSelectorData>((acc, row) => {
     const { document, title, subtitle, chunk, text, id, nacional, region } =
       row;
     const regionOrNacional = nacional ? "nacional" : region;
@@ -53,3 +55,12 @@ export const getChunkData = async () => {
     return acc;
   }, {});
 };
+
+export const getCachedChunkedData = cachified({
+  key: "chunkedData",
+  ttl: 1000 * 60 * 60 * 24, // 24 hours
+  async getFreshValue() {
+    console.log(" - MISS chunkedData");
+    return getChunkData();
+  },
+});
