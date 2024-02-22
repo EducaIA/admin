@@ -12,7 +12,7 @@ const createQuestionSchema = z.object({
   id: z.coerce.number(),
   type: z.string(),
   pregunta: z.string(),
-  chunks: stringToJSONSchema.pipe(z.record(z.array(z.string()))),
+  chunks: stringToJSONSchema.pipe(z.record(z.array(z.string())).optional()),
   oposicion: z.string().default("infantil"),
   topics: stringToJSONSchema.pipe(z.array(z.string())),
   answer: z.record(z.string()),
@@ -34,11 +34,13 @@ export const runEditQuestionAction = async (formData: FormData) => {
 
     const data = createQuestionSchema.safeParse({
       ...fullBody,
+      chunks: fullBody.chunk ?? "{}",
       answer,
     });
 
     if (!data.success) {
       const errors = data.error.errors.map((error) => error.message).join(", ");
+      console.error(data.error.errors);
       return redirectWithError("/", {
         message: `Error en el formulario: ${errors}`,
       });
@@ -79,22 +81,24 @@ export const runEditQuestionAction = async (formData: FormData) => {
         .where(eq(cacheGroup.id, id))
         .execute();
 
-      for (const [region, chunks] of Object.entries(regionalChunks)) {
-        await trx
-          .delete(cacheGroupChunks)
-          .where(eq(cacheGroupChunks.group_id, id))
-          .execute();
+      if (typeof regionalChunks !== "undefined") {
+        for (const [region, chunks] of Object.entries(regionalChunks)) {
+          await trx
+            .delete(cacheGroupChunks)
+            .where(eq(cacheGroupChunks.group_id, id))
+            .execute();
 
-        await trx
-          .insert(cacheGroupChunks)
-          .values(
-            chunks.map((chunk) => ({
-              group_id: id,
-              chunk_id: chunk,
-              region,
-            })),
-          )
-          .execute();
+          await trx
+            .insert(cacheGroupChunks)
+            .values(
+              chunks.map((chunk) => ({
+                group_id: id,
+                chunk_id: chunk,
+                region,
+              })),
+            )
+            .execute();
+        }
       }
     });
 
@@ -110,6 +114,8 @@ export const runEditQuestionAction = async (formData: FormData) => {
     JOIN topics on topics.id = messages.topic_id
     WHERE content = ${originalQuestion} 
   `);
+
+    console.log(originalQuestion, questions);
 
     for (const question of questions.rows) {
       const group = await db
@@ -138,7 +144,7 @@ export const runEditQuestionAction = async (formData: FormData) => {
       );
 
       try {
-        await MicroservicesClient.post("/admin/notifications", {
+        const res = await MicroservicesClient.post("/admin/notifications", {
           level: "warning",
           type: "la bot",
           message: `El ${datetime} hiciste la siguiente pregunta en el ${question.title}: 
