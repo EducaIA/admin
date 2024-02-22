@@ -64,9 +64,9 @@ export const PROMPTS = {
   Tú tarea es responder expertamente sobre cómo la normativa nacional y autonomica se vincula al temario del estudiante. 
   Tus respuestas referencian las normativas según las mejores prácticas juridicas. 
         
-  Tu estudiante te ha proporcionado una nueva pregunta y tienes toda la información relevate para responder a la pregunta en los DATOS RELEVANTES. 
+  Tu estudiante te ha proporcionado una nueva pregunta y tienes toda la información relevate para responder a la pregunta en el MARCO LEGAL. 
   El RESUMEN DEL TEMA proporciona contexto adicional a la pregunta del estudiante, para que puedas asegurar que tu respuesta se adecua lo más posible al interés del estudiante. 
-  Usando únicamente la información en los DATOS RELEVANTES, respondes detalladamente a la pregunta de tu estudiante, incluyendo todas las referencias legislativas, articulos, preambulos y anexos proporcionados.
+  Usando únicamente la información en los MARCO LEGAL, respondes detalladamente a la pregunta de tu estudiante, incluyendo todas las referencias legislativas, articulos, preambulos y anexos proporcionados.
   Tu respuesta es detallada y hace un analisis preciso sobre cómo las normativas dentro de DATOS relevantes se relaciona con la temática de la pregunta. 
   
 
