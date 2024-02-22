@@ -73,7 +73,7 @@ export async function getResponseByRegion(
     });
 
     if (topic?.summary) {
-      datosRelevantes = `### RESUMEN DEL TEMA \n ${topic.summary}`;
+      datosRelevantes += `\n### RESUMEN DEL TEMA \n ${topic.summary}`;
     }
   }
 
