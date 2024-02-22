@@ -76,7 +76,7 @@ export const MicroservicesClient = {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": options?.api_key ?? API_KEY,
+          "x-api-key": options?.api_key ?? API_KEY ?? "",
         },
         body: body ? JSON.stringify(body) : null,
       });

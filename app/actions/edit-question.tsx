@@ -1,11 +1,11 @@
-import { redirect } from "@remix-run/node";
 import { eq, sql } from "drizzle-orm";
 import { redirectWithError, redirectWithSuccess } from "remix-toast";
 import { z } from "zod";
 import { db } from "~/server/db";
-import { cacheGroup, cacheGroupChunks } from "~/server/db/cache";
+import { cacheGroup, cacheGroupChunks } from "~/server/db/entities/cache";
 import { MicroservicesClient } from "~/server/microservices";
-import { createEmbeddings } from "~/utils/openai";
+import { createEmbeddings } from "~/server/openai";
+
 import { stringToJSONSchema } from "~/utils/utils";
 
 const createQuestionSchema = z.object({

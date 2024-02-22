@@ -1,5 +1,6 @@
-import { jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { vector } from "pgvector/drizzle-orm";
+
+import { jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 export const embedding_subchunk = pgTable("embeddings_subchunking", {
   id: text("id").notNull().primaryKey(),

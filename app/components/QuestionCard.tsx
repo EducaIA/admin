@@ -2,7 +2,6 @@ import { Check, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { distinct, getPrettyTime } from "~/utils/utils";
-import { CacheGroup, UserQuestion } from "~/server/db";
 import { FullChunkSelectorData } from "~/types";
 
 import ChunkSelector, { type SelectorData } from "./ChunkSelector";
@@ -15,6 +14,7 @@ import { Textarea } from "./ui/textarea";
 import { Badge } from "./ui/badge";
 import { Form, useFetcher } from "@remix-run/react";
 import { toast } from "sonner";
+import { CacheGroup, UserQuestion } from "~/server/db/queries";
 
 const Responses = ({ responses }: { responses: Record<string, string> }) => {
   const responseKeys = Object.keys(responses);
@@ -272,6 +272,7 @@ export function QuestionCard({
                         {
                           question: question,
                           chunks: JSON.stringify(regionChunkIdMap),
+                          topics: selectedTopics,
                         },
                         {
                           method: "POST",

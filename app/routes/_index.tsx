@@ -4,7 +4,7 @@ import {
   type LoaderFunctionArgs,
   type MetaFunction,
 } from "@remix-run/node";
-import { useLoaderData, useSearchParams } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { promiseHash } from "remix-utils/promise";
 import { Navbar } from "~/components/Navbar";
 import QuestionCreator from "~/components/QuestionCreator";
@@ -14,8 +14,9 @@ import {
   getOposiciones,
   getTopics,
   getUserQuestions,
-} from "~/server/db";
-import { getChunkData } from "~/server/db/data_db";
+  getChunkData,
+} from "~/server/db/queries";
+
 import { authenticator } from "~/.server/auth";
 import { QuestionCard } from "~/components/QuestionCard";
 import Paginator from "~/components/Paginator";

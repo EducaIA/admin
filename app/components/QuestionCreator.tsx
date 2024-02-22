@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 
 import { FullChunkSelectorData } from "~/types";
@@ -6,7 +5,6 @@ import { FullChunkSelectorData } from "~/types";
 import { toast } from "sonner";
 
 import { distinct } from "~/utils/utils";
-import { CacheGroup, UserQuestion } from "~/server/db";
 
 import ChunkSelector, { type SelectorData } from "./ChunkSelector";
 import { Button } from "./ui/button";
@@ -16,6 +14,7 @@ import { Label } from "./ui/label";
 import MultipleSelector from "./ui/multiple-selector";
 import { Textarea } from "./ui/textarea";
 import { Form, useFetcher } from "@remix-run/react";
+import { CacheGroup, UserQuestion } from "~/server/db/queries";
 
 const Responses = ({ responses }: { responses: Record<string, string> }) => {
   const renderTextarea = (region: string, text: string) => (
@@ -168,6 +167,7 @@ export function CreateQuestionCard({
                     : ""
                 }
               />
+
               <Responses
                 responses={
                   responseFetcher.data?.success === true
@@ -208,6 +208,7 @@ export function CreateQuestionCard({
                         {
                           question: question,
                           chunks: JSON.stringify(regionChunkIdMap),
+                          topics: selectedTopics,
                         },
                         {
                           method: "POST",

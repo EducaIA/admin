@@ -7,7 +7,6 @@ import {
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
-import { vector } from "pgvector/drizzle-orm";
 
 import { cacheGroupRelatedQuestions } from "./cache";
 import { topics } from "./oposiciones";

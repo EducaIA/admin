@@ -6,6 +6,7 @@ import { stringToJSONSchema } from "~/utils/utils";
 const createResponsesSchema = z.object({
   question: z.string(),
   chunks: stringToJSONSchema.pipe(z.record(z.array(z.string()))),
+  topics: z.string().optional(),
 });
 
 export const action: ActionFunction = async ({ request }) => {
@@ -19,31 +20,42 @@ export const action: ActionFunction = async ({ request }) => {
     return { success: false, error: res.error };
   }
 
-  const { question, chunks } = res.data;
+  const { question, chunks, topics } = res.data;
+
+  let topicsArray: string[] = [];
+
+  if (topics !== undefined && topics !== "") {
+    topicsArray = topics.split(",");
+  }
 
   const responses: Record<string, string> = {};
 
-  const responsePromises = Object.entries(chunks).map(
-    async ([region, regionChunks]) => {
-      const response = await getResponseByRegion(regionChunks, question);
-      return [region, response];
-    },
-  );
+  try {
+    const responsesArray = await Promise.all(
+      Object.entries(chunks).map(async ([region, regionChunks]) => {
+        const response = await getResponseByRegion(
+          regionChunks,
+          question,
+          topicsArray ?? [],
+        );
+        return [region, response];
+      }),
+    );
 
-  for (const promise of responsePromises) {
-    try {
-      await promise;
-    } catch (e) {
-      console.log(e);
+    for (const [region, response] of responsesArray) {
+      if (region && response) {
+        responses[region] = response;
+      }
     }
-  }
+  } catch (e) {
+    console.log(e);
 
-  const responsesArray = await Promise.all(responsePromises);
-
-  for (const [region, response] of responsesArray) {
-    if (region && response) {
-      responses[region] = response;
-    }
+    return {
+      success: false,
+      error: `An error occurred while generating the response: ${
+        (e as Error).message
+      }`,
+    };
   }
 
   return {

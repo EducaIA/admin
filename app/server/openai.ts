@@ -6,8 +6,6 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export const encoder = encodingForModel("gpt-3.5-turbo");
-
 export async function createEmbeddings(text: string) {
   const embeddings = await openai.embeddings.create({
     input: text,

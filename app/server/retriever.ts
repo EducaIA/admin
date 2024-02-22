@@ -1,14 +1,17 @@
 import { inArray } from "drizzle-orm";
 import lodash from "lodash";
 
-import { data_db } from "./db/data_db";
-import { EmbeddingSubchunk, embedding_subchunk } from "./db/embedding_subchunk";
 import {
   PROMPTS,
   chatCompletion,
   createCompletion,
   getPromptWithReplacements,
 } from "./openai";
+import { data_db, db } from "./db";
+import {
+  EmbeddingSubchunk,
+  embedding_subchunk,
+} from "./db/entities/embedding_subchunk";
 
 export async function summarizeByDocument(
   query: string,
@@ -43,7 +46,11 @@ export async function extractiveSummarization(
   );
 }
 
-export async function getResponseByRegion(chunks: string[], question: string) {
+export async function getResponseByRegion(
+  chunks: string[],
+  question: string,
+  topicsArray: string[]
+) {
   const embeddingsChunks = await data_db.query.embedding_subchunk.findMany({
     where: inArray(embedding_subchunk.id, chunks),
   });
@@ -57,13 +64,25 @@ export async function getResponseByRegion(chunks: string[], question: string) {
     question
   );
 
+  let datosRelevantes = `DATOS RELEVANTES\n### MARCO LEGAL \n ${summarizedByRegion}`;
+
+  if (topicsArray.length === 1) {
+    const topic = await db.query.topics.findFirst({
+      where: (topics, { eq, and }) =>
+        and(eq(topics.title, topicsArray[0]), eq(topics.kb_folder_id, 5)),
+    });
+
+    if (topic?.summary) {
+      datosRelevantes = `### RESUMEN DEL TEMA \n ${topic.summary}`;
+    }
+  }
+
   const askChatResponse = await chatCompletion(
     [
       { role: "system", content: PROMPTS.QA_LEGAL_WITH_CONTEXT },
       {
-        role: "system",
-        content: `DATOS RELEVANTES
-                          ${summarizedByRegion}`,
+        role: "user",
+        content: datosRelevantes,
       },
       { role: "user", content: question },
     ],
