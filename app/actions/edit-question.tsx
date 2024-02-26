@@ -142,21 +142,21 @@ export const runEditQuestionAction = async (formData: FormData) => {
       );
 
       try {
-        //         const res = await MicroservicesClient.post("/admin/notifications", {
-        //           level: "warning",
-        //           type: "la bot",
-        //           message: `El ${datetime} hiciste la siguiente pregunta en el ${question.title}:
+        const res = await MicroservicesClient.post("/admin/notifications", {
+          level: "warning",
+          type: "la bot",
+          message: `El ${datetime} hiciste la siguiente pregunta en el ${question.title}:
 
-        // **TU PREGUNTA**: ${originalQuestion}
+        **TU PREGUNTA**: ${originalQuestion}
 
-        // y te dimos una respuesta incorrecta o incompleta. Hemos revisado la respuesta y la correcta es:
+        y te dimos una respuesta incorrecta o incompleta. Hemos revisado la respuesta y la correcta es:
 
-        // \`\`\`
-        // ${response}
-        // \`\`\`
-        //       `,
-        //           user_id: question.user_id,
-        //         });
+        \`\`\`
+        ${response}
+        \`\`\`
+              `,
+          user_id: question.user_id,
+        });
 
         console.log("Notification sent");
       } catch (e) {
