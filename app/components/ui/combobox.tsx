@@ -1,4 +1,3 @@
-
 import { ChevronsUpDownIcon, SearchIcon } from "lucide-react";
 import * as React from "react";
 
@@ -15,8 +14,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "~/components/ui/popover";
-
-import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 
 export function ComboboxDemo({
   placeholder,
@@ -65,23 +62,6 @@ export function ComboboxDemo({
                 }}
               >
                 <div>{usableValue}</div>
-                {texts &&
-                  texts.find((text) => text.chunk_id.endsWith(usableValue)) && (
-                    <div className="flex flex-col justify-center">
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <SearchIcon className="rounded ml-auto h-5 w-5 p-1 hover:bg-slate-200" />
-                        </TooltipTrigger>
-                        <TooltipContent className="max-h-[300px] max-w-[300px] overflow-scroll">
-                          {
-                            texts.find((text) =>
-                              text.chunk_id.endsWith(usableValue),
-                            )?.text
-                          }
-                        </TooltipContent>
-                      </Tooltip>
-                    </div>
-                  )}
               </CommandItem>
             ))}
           </CommandGroup>

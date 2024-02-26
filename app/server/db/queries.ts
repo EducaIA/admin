@@ -4,11 +4,11 @@ import { alias } from "drizzle-orm/pg-core";
 
 import { cacheGroup } from "./entities/cache";
 
+import { distinct } from "~/utils/utils";
+import { data_db, db } from ".";
 import { messageData, messages } from "./entities/messages";
 import { oposiciones, topics } from "./entities/oposiciones";
 import { users } from "./entities/users";
-import { distinct } from "~/utils/utils";
-import { data_db, db } from ".";
 
 import { cachified } from "~/.server/cache";
 import { FullChunkSelectorData } from "~/types";
@@ -102,7 +102,7 @@ export const getUserQuestions = async (onlyLegislative: boolean, page = 0) => {
     .where(
       and(
         sql`(${messageData.data}->'cache'->>'hit')::boolean IS NOT TRUE`,
-        sql`${messageData.id} NOT IN (SELECT DISTINCT id FROM ${cacheGroup})`,
+        sql`trim(${questions.content}) NOT IN (SELECT DISTINCT TRIM(question) FROM ${cacheGroup})`,
         or(isNotNull(questions.content), isNotNull(answers.content)),
         onlyLegislative
           ? sql`(${messageData.data}->>'classified_question') not ilike '%N/A%'`
@@ -115,16 +115,6 @@ export const getUserQuestions = async (onlyLegislative: boolean, page = 0) => {
 };
 
 export type UserQuestion = Awaited<ReturnType<typeof getUserQuestions>>[number];
-
-export const getAvailableRegionsForParentOposicion = async (
-  parentOposicion: string
-) => {
-  const res = await db.query.oposiciones.findMany({
-    where: ilike(oposiciones.pinecone_id, `%${parentOposicion}%`),
-  });
-
-  return distinct(res.map((oposicion) => oposicion.pinecone_id.split("_")[1]));
-};
 
 export const getLastIds = async () => {
   const questions = await db.query.messages.findMany({

@@ -30,7 +30,7 @@ export const runCreateQuestionAction = async (formData: FormData) => {
 
     const data = createQuestionSchema.safeParse({
       ...fullBody,
-      chunks: fullBody.chunk ?? "{}",
+      chunks: fullBody.chunks ?? "{}",
       answer,
     });
 

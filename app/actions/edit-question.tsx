@@ -34,7 +34,7 @@ export const runEditQuestionAction = async (formData: FormData) => {
 
     const data = createQuestionSchema.safeParse({
       ...fullBody,
-      chunks: fullBody.chunk ?? "{}",
+      chunks: fullBody.chunks ?? "{}",
       answer,
     });
 
@@ -115,8 +115,6 @@ export const runEditQuestionAction = async (formData: FormData) => {
     WHERE content = ${originalQuestion} 
   `);
 
-    console.log(originalQuestion, questions);
-
     for (const question of questions.rows) {
       const group = await db
         .select()
@@ -144,21 +142,21 @@ export const runEditQuestionAction = async (formData: FormData) => {
       );
 
       try {
-        const res = await MicroservicesClient.post("/admin/notifications", {
-          level: "warning",
-          type: "la bot",
-          message: `El ${datetime} hiciste la siguiente pregunta en el ${question.title}: 
-      
-**TU PREGUNTA**: ${originalQuestion}
-      
-y te dimos una respuesta incorrecta o incompleta. Hemos revisado la respuesta y la correcta es:
+        //         const res = await MicroservicesClient.post("/admin/notifications", {
+        //           level: "warning",
+        //           type: "la bot",
+        //           message: `El ${datetime} hiciste la siguiente pregunta en el ${question.title}:
 
-\`\`\`
-${response}
-\`\`\`
-      `,
-          user_id: question.user_id,
-        });
+        // **TU PREGUNTA**: ${originalQuestion}
+
+        // y te dimos una respuesta incorrecta o incompleta. Hemos revisado la respuesta y la correcta es:
+
+        // \`\`\`
+        // ${response}
+        // \`\`\`
+        //       `,
+        //           user_id: question.user_id,
+        //         });
 
         console.log("Notification sent");
       } catch (e) {
