@@ -54,7 +54,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { toast, headers } = await getToast(request);
   const onlyLegislative = params.get("questionType") === "legislativas";
 
-  let questionsPromise = getUserQuestions(onlyLegislative, Number(page) - 1);
+  const questionType = params.get("messageType") ?? "all";
+
+  let questionsPromise = getUserQuestions(
+    onlyLegislative,
+    Number(page) - 1,
+    questionType,
+  );
   let cacheGroupsPromise = getExistingCacheGroups({
     page: Number(page) - 1,
   });

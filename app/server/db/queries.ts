@@ -67,51 +67,55 @@ export const getExistingCacheGroups = async ({
   });
 };
 
-export const getUserQuestions = async (onlyLegislative: boolean, page = 0) => {
+export const getUserQuestions = async (
+  onlyLegislative: boolean,
+  page = 0,
+  type = "qa",
+) => {
   const questions = alias(messages, "questions");
   const answers = alias(messages, "answers");
 
+
   return db
-    .selectDistinct({
-      id: messageData.id,
-      question_id: questions.id,
-      response_id: answers.id,
-      question: questions.content,
-      response: answers.content,
-      userEmail: users.email,
-      cached: sql<boolean>`false`.as("cached"),
-      topic_id: topics.title,
-      oposicion_slug:
-        sql<string>`(SELECT split_part(pinecone_id, '_', 2) FROM search_oposicion_by_topic_id(${messages.topic_id}::int))`.as(
-          "oposicion_slug"
-        ),
-      created_at: messageData.created_at,
-      updated_at: messageData.updated_at,
-      type: sql`'question'`.as("type"),
-      legislative:
-        sql`(${messageData.data}->>'classified_question') not ilike '%N/A%'`.as(
-          "legislative"
-        ),
-    })
-    .from(messageData)
-    .innerJoin(messages, eq(messageData.question_id, messages.id))
-    .innerJoin(topics, eq(messages.topic_id, topics.id))
-    .innerJoin(answers, eq(messageData.response_id, answers.id))
-    .innerJoin(questions, eq(messageData.question_id, questions.id))
-    .innerJoin(users, eq(questions.user_id, users.id))
-    .where(
-      and(
-        sql`(${messageData.data}->'cache'->>'hit')::boolean IS NOT TRUE`,
-        sql`trim(${questions.content}) NOT IN (SELECT DISTINCT TRIM(question) FROM ${cacheGroup})`,
-        or(isNotNull(questions.content), isNotNull(answers.content)),
-        onlyLegislative
-          ? sql`(${messageData.data}->>'classified_question') not ilike '%N/A%'`
-          : undefined
-      )
-    )
-    .orderBy(desc(messageData.id))
-    .limit(50)
-    .offset(page * 50);
+  .selectDistinct({
+    id: messageData.id,
+    question_id: questions.id,
+    response_id: answers.id,
+    question: questions.content,
+    response: answers.content,
+    userEmail: users.email,
+    cached: sql<boolean>`false`.as("cached"),
+    topic_id: topics.title,
+    oposicion_slug: sql<string>`CASE WHEN questions.api_type = 'unidades_didacticas' THEN (SELECT distinct split_part(oposicion_slug, '_', 2) FROM unidades_didacticas where id = ${messages.topic_id}) ELSE (SELECT split_part(pinecone_id, '_', 2) FROM search_oposicion_by_topic_id (${messages.topic_id}::int)) END`.as("oposicion_slug"),
+    created_at: messageData.created_at,
+    updated_at: messageData.updated_at,
+    api_type: questions.api_type,
+    type: sql`'question'`.as("type"),
+    legislative:
+      sql`(${messageData.data}->>'classified_question') not ilike '%N/A%'`.as(
+        "legislative",
+      ),
+  })
+  .from(messageData)
+  .innerJoin(messages, eq(messageData.question_id, messages.id))
+  .leftJoin(topics, eq(messages.topic_id, topics.id))
+  .innerJoin(answers, eq(messageData.response_id, answers.id))
+  .innerJoin(questions, eq(messageData.question_id, questions.id))
+  .innerJoin(users, eq(questions.user_id, users.id))
+  .where(
+    and(
+      sql`COALESCE(("message_data"."data" -> 'cache' ->> 'hit')::boolean, FALSE) IS NOT TRUE`,
+      sql`trim(${questions.content}) NOT IN (SELECT DISTINCT TRIM(question) FROM ${cacheGroup})`,
+      or(isNotNull(questions.content), isNotNull(answers.content)),
+      onlyLegislative
+        ? sql`(${messageData.data}->>'classified_question') not ilike '%N/A%'`
+        : undefined,
+      type ? eq(messages.api_type, type) : undefined
+    ),
+  )
+  .orderBy(desc(messageData.id))
+  .limit(50)
+  .offset(page * 50)
 };
 
 export type UserQuestion = Awaited<ReturnType<typeof getUserQuestions>>[number];
@@ -149,7 +153,7 @@ export const getChunkData = async () => {
       WHEN document_id IN (SELECT document_id FROM national_documents)
       THEN true
       ELSE false
-      END as nacional FROM region_data;`
+      END as nacional FROM region_data;`,
   );
 
   return rows.reduce<FullChunkSelectorData>((acc, row) => {

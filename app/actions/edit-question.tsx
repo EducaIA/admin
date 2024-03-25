@@ -160,6 +160,7 @@ export const runEditQuestionAction = async (formData: FormData) => {
 
         console.log("Notification sent");
       } catch (e) {
+        console.error(e);
         throw new Error(`Error sending notification: ${(e as Error).message}`);
       }
     }

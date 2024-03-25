@@ -1,20 +1,20 @@
 import { Check, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { distinct, getPrettyTime } from "~/utils/utils";
 import { FullChunkSelectorData } from "~/types";
+import { distinct, getPrettyTime } from "~/utils/utils";
 
+import { Form, useFetcher } from "@remix-run/react";
+import { toast } from "sonner";
+import { CacheGroup, UserQuestion } from "~/server/db/queries";
 import ChunkSelector, { type SelectorData } from "./ChunkSelector";
+import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import MultipleSelector from "./ui/multiple-selector";
 import { Textarea } from "./ui/textarea";
-import { Badge } from "./ui/badge";
-import { Form, useFetcher } from "@remix-run/react";
-import { toast } from "sonner";
-import { CacheGroup, UserQuestion } from "~/server/db/queries";
 
 const Responses = ({ responses }: { responses: Record<string, string> }) => {
   const responseKeys = Object.keys(responses);
@@ -192,35 +192,39 @@ export function QuestionCard({
                 )}
 
                 <div className="mt-2 text-sm font-light">
-                  <label htmlFor="">
-                    Selector de Tema
-                    <MultipleSelector
-                      className="mt-1"
-                      options={topics}
-                      onChange={(e) => {
-                        setSelectedTopics(e.map((item) => item.value));
-                      }}
-                      badgeClassName="bg-slate-200 text-slate-900 rounded-md hover:bg-red-200 hover:text-red-900"
-                      value={selectedTopics.map((item) => ({
-                        value: item,
-                        label: item,
-                      }))}
-                    />
-                    <input
-                      type="hidden"
-                      name="topics"
-                      value={JSON.stringify(selectedTopics)}
-                    />
-                    <input
-                      type="hidden"
-                      name="chunks"
-                      value={
-                        Object.keys(regionChunkIdMap).length > 0
-                          ? JSON.stringify(regionChunkIdMap)
-                          : ""
-                      }
-                    />
-                  </label>
+                  {(initialData?.api_type ?? "qa") !== "unidades_didacticas" ? (
+                    <label htmlFor="">
+                      Selector de Tema
+                      <MultipleSelector
+                        className="mt-1"
+                        options={topics}
+                        onChange={(e) => {
+                          setSelectedTopics(e.map((item) => item.value));
+                        }}
+                        badgeClassName="bg-slate-200 text-slate-900 rounded-md hover:bg-red-200 hover:text-red-900"
+                        value={selectedTopics.map((item) => ({
+                          value: item,
+                          label: item,
+                        }))}
+                      />
+                      <input
+                        type="hidden"
+                        name="topics"
+                        value={JSON.stringify(selectedTopics)}
+                      />
+                      <input
+                        type="hidden"
+                        name="chunks"
+                        value={
+                          Object.keys(regionChunkIdMap).length > 0
+                            ? JSON.stringify(regionChunkIdMap)
+                            : ""
+                        }
+                      />
+                    </label>
+                  ) : (
+                    <Badge variant="default">Unidad Didáctica</Badge>
+                  )}
                 </div>
                 <div className="flex space-x-2">
                   {legal && <Badge variant="default">Legal</Badge>}
